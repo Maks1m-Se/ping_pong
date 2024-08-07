@@ -10,11 +10,12 @@ SCREEN_HEIGHT = 600
 PADDLE_WIDTH = 20
 PADDLE_HEIGHT = 100
 BALL_SIZE = 40
-BALL_SPEED_X = 5
-BALL_SPEED_Y = 5
-PADDLE_SPEED = 5
+BALL_SPEED_X = 4
+BALL_SPEED_Y = 4
+PADDLE_SPEED = 3
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+DRAG_COEFFICIENT = 0.8  # Determines the strength of the drag effect
 
 # Set up the game window
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -70,14 +71,22 @@ while True:
     # Ball collision with top and bottom walls
     if ball.top <= 0 or ball.bottom >= SCREEN_HEIGHT:
         ball_speed_y = -ball_speed_y
-    
+        ball_rotation_speed *= 0.9  # Simulate friction by reducing rotation speed
+
     # Ball collision with paddles
     if ball.colliderect(player_paddle):
         ball_speed_x = -ball_speed_x
         ball_rotation_speed = -player_velocity  # Set rotation speed based on paddle velocity
+        ball_speed_y += DRAG_COEFFICIENT * ball_rotation_speed  # Apply drag effect
+        # Adjust ball's velocity based on paddle speed
+        ball_speed_y += player_velocity * 0.1
+    
     if ball.colliderect(computer_paddle):
         ball_speed_x = -ball_speed_x
         ball_rotation_speed = -PADDLE_SPEED
+        ball_speed_y += DRAG_COEFFICIENT * ball_rotation_speed  # Apply drag effect
+        # Adjust ball's velocity based on computer paddle speed (constant speed influence)
+        ball_speed_y += PADDLE_SPEED * 0.1
     
     # Ball goes out of bounds (left or right)
     if ball.left <= 0 or ball.right >= SCREEN_WIDTH:
